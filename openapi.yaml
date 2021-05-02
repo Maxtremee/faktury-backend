@@ -1,0 +1,730 @@
+openapi: 3.0.0
+info:
+  title: Java Faktury Project API
+  description: "API for project about generating invoices using Java, Spring Boot,\
+    \ MongoDB and React"
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.1
+servers:
+- url: https://virtserver.swaggerhub.com/Maxtremee/projekt-java-faktury/1.0.1
+  description: SwaggerHub API Auto Mocking
+security:
+- cookieAuth: []
+tags:
+- name: auth
+  description: Routes related to authenticated actions i.e. logging in
+- name: invoice
+  description: "Routes related to creating, updating or retrieving invoices"
+- name: contractor
+  description: "Routes related to creating, updating or retrieving contractors"
+- name: product
+  description: Routes related to creating or retrieving products
+paths:
+  /login:
+    post:
+      tags:
+      - auth
+      summary: logs user in
+      description: |
+        If supplied with existing login and password generates session and grants user access to service
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      responses:
+        "200":
+          description: successfully logged in
+          headers:
+            Set-Cookie:
+              style: simple
+              explode: false
+              schema:
+                type: string
+                example: SESSIONID=abcde12345; Path=/; HttpOnly
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contractor'
+        "400":
+          description: wrong request
+        "404":
+          description: no such user
+        "500":
+          description: internal server error
+      security: []
+  /signup:
+    post:
+      tags:
+      - auth
+      summary: signup
+      description: "Signup user by supplying his email, password and company info\n"
+      operationId: signup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Signup'
+        required: true
+      responses:
+        "200":
+          description: successfully created account
+        "400":
+          description: wrong request
+        "409":
+          description: user already exists
+        "500":
+          description: internal server error
+      security: []
+  /change-password:
+    put:
+      tags:
+      - auth
+      summary: change password for user
+      operationId: changePassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewPassword'
+        required: true
+      responses:
+        "200":
+          description: successfully changed password
+        "400":
+          description: wrong request
+        "403":
+          description: forbidden
+        "500":
+          description: internal server error
+  /change-personal-info:
+    put:
+      tags:
+      - auth
+      summary: change user's personal info
+      operationId: changePersonalInfo
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Contractor'
+        required: true
+      responses:
+        "200":
+          description: successfully changed personal info
+        "400":
+          description: wrong request
+        "403":
+          description: forbidden
+        "500":
+          description: internal server error
+  /invoice:
+    get:
+      tags:
+      - invoice
+      summary: get filtered invoices
+      operationId: getInvoices
+      parameters:
+      - name: name
+        in: query
+        description: Name of invoice to filter with
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: quantity
+        in: query
+        description: The number of invoices to return. Fetches all qualifying if not
+          specified
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: before
+        in: query
+        description: Date to filter out invoices before specified day
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date
+      - name: after
+        in: query
+        description: Date to filter out invoices after specified day
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date
+      - name: contractor
+        in: query
+        description: UUID of a contractor to get invoices from
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Invoice'
+        "400":
+          description: wrong request
+        "403":
+          description: forbidden
+        "500":
+          description: internal server error
+    post:
+      tags:
+      - invoice
+      summary: create new invoice
+      operationId: newInvoice
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Invoice'
+        required: true
+      responses:
+        "201":
+          description: invoice created
+        "400":
+          description: wrong request
+        "403":
+          description: forbidden
+        "500":
+          description: internal server error
+  /invoice/pdf:
+    get:
+      tags:
+      - invoice
+      summary: get filtered invoices summary in pdf
+      operationId: getInvoicesPdf
+      parameters:
+      - name: name
+        in: query
+        description: Name of invoice to filter with
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: quantity
+        in: query
+        description: The number of invoices to return. Fetches all qualifying if not
+          specified
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: before
+        in: query
+        description: Date to filter out invoices before specified day
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date
+      - name: after
+        in: query
+        description: Date to filter out invoices after specified day
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: date
+      - name: contractor
+        in: query
+        description: UUID of a contractor to get invoices from
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: success
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: wrong request
+        "403":
+          description: forbidden
+        "500":
+          description: internal server error
+  /invoice/{id}:
+    get:
+      tags:
+      - invoice
+      summary: get specific invoice
+      operationId: getInvoice
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the invoice to get
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+        "400":
+          description: wrong request
+        "404":
+          description: no such invoice
+        "500":
+          description: internal server error
+    put:
+      tags:
+      - invoice
+      summary: update invoice
+      operationId: updateInvoice
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the invoice to update
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Invoice'
+        required: true
+      responses:
+        "200":
+          description: success
+        "204":
+          description: no content
+        "403":
+          description: forbidden
+        "404":
+          description: no such contractor
+        "500":
+          description: internal server error
+  /invoice/{id}/pdf:
+    get:
+      tags:
+      - invoice
+      summary: get specific invoice in pdf
+      operationId: getInvoicePdf
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the invoice to get
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: success
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: wrong request
+        "404":
+          description: no such invoice
+        "500":
+          description: internal server error
+  /contractor:
+    get:
+      tags:
+      - contractor
+      summary: search for existing contractrors (autocomplete)
+      operationId: getContractors
+      parameters:
+      - name: searchstr
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: Media
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Contractor'
+        "400":
+          description: wrong request
+        "500":
+          description: internal server error
+    post:
+      tags:
+      - contractor
+      summary: add new contractor to database
+      operationId: newContractor
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Contractor'
+        required: true
+      responses:
+        "201":
+          description: contractor created
+        "400":
+          description: wrong request
+        "409":
+          description: contractor already exists
+        "500":
+          description: internal server error
+  /contractor/{id}:
+    put:
+      tags:
+      - contractor
+      summary: update contractor data
+      operationId: updateContractor
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the contractor to update
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Contractor'
+        required: true
+      responses:
+        "200":
+          description: success
+        "204":
+          description: no content
+        "403":
+          description: forbidden
+        "404":
+          description: no such contractor
+        "500":
+          description: internal server error
+    delete:
+      tags:
+      - contractor
+      summary: delete specified contractor
+      operationId: deleteContractor
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the contractor to delete
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: success
+        "400":
+          description: wrong request
+        "403":
+          description: forbidden
+        "404":
+          description: no such contractor
+        "500":
+          description: internal server error
+  /product:
+    get:
+      tags:
+      - product
+      summary: search for existing products (autocomplete)
+      operationId: getProducts
+      parameters:
+      - name: searchstr
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          example: jabłka
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        "400":
+          description: wrong request
+        "500":
+          description: internal server error
+    post:
+      tags:
+      - product
+      summary: add new product to database
+      operationId: newProduct
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+        required: true
+      responses:
+        "201":
+          description: product created
+        "400":
+          description: wrong request
+        "409":
+          description: product already exists
+        "500":
+          description: internal server error
+  /product/{id}:
+    put:
+      tags:
+      - product
+      summary: update product data
+      operationId: updateProduct
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the product to update
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+        required: true
+      responses:
+        "200":
+          description: success
+        "204":
+          description: no content
+        "403":
+          description: forbidden
+        "404":
+          description: no such product
+        "500":
+          description: internal server error
+    delete:
+      tags:
+      - product
+      summary: delete specified product
+      operationId: deleteProduct
+      parameters:
+      - name: id
+        in: path
+        description: UUID of the product to delete
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "200":
+          description: success
+        "400":
+          description: wrong request
+        "403":
+          description: forbidden
+        "404":
+          description: no such product
+        "500":
+          description: internal server error
+components:
+  schemas:
+    Login:
+      required:
+      - login
+      - password
+      type: object
+      properties:
+        login:
+          type: string
+          example: email@email.com
+        password:
+          type: string
+          example: password123
+    Signup:
+      required:
+      - company
+      - login
+      - password
+      type: object
+      properties:
+        login:
+          type: string
+          example: email@email.com
+        password:
+          type: string
+          example: password123
+        company:
+          $ref: '#/components/schemas/Contractor'
+    NewPassword:
+      required:
+      - new_password
+      - old_password
+      type: object
+      properties:
+        old_password:
+          type: string
+          example: OldPassword
+        new_password:
+          type: string
+          example: NewPassword
+    Invoice:
+      required:
+      - contractorId
+      - created
+      - dueDate
+      - issueDate
+      - issuePlace
+      - products
+      - title
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        contractorId:
+          type: string
+          format: uuid
+        title:
+          type: string
+          example: 5324/04/2021
+        products:
+          type: array
+          items:
+            type: string
+            format: uuid
+        created:
+          type: string
+          format: date-time
+          example: 2017-07-21T17:32:28Z
+        edited:
+          type: string
+          format: date-time
+          example: 2017-07-21T17:32:28Z
+        issuePlace:
+          type: string
+          example: Wrocław
+        issueDate:
+          type: string
+          format: date
+          example: 2016-08-29
+        sellDate:
+          type: string
+          example: 2016-08-29
+        dueDate:
+          type: string
+          format: date
+          example: 2016-08-30
+        notes:
+          type: string
+          example: Płatność gotówką
+    Product:
+      required:
+      - name
+      - price
+      - quantity
+      - tax
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: straws
+        price:
+          type: number
+          example: 35.9
+        tax:
+          type: integer
+          example: 23
+        quantity:
+          type: number
+          example: 25.2
+    Contractor:
+      required:
+      - firstAddressLine
+      - name
+      - nip
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Media Saturn Online Sp. z o.o.
+        nip:
+          type: string
+          example: "1234567890"
+        firstAddressLine:
+          type: string
+          example: "Al. Jerozolimskie 179, 02-222 Warszawa."
+        secondAddressLine:
+          type: string
+          example: "Budynek B2, piętro 6"
+        info:
+          type: string
+          example: "tel. 123 456 789, email: email@email.com"
+        bankName:
+          type: string
+          example: ALIOR BANK SA
+        bankAccountNumber:
+          type: string
+          example: PL12 3456 0000 0000 0000 0000 7890
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      name: SESSIONID
+      in: cookie
