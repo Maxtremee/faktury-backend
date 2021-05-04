@@ -166,13 +166,12 @@ paths:
           format: date
       - name: contractor
         in: query
-        description: UUID of a contractor to get invoices from
+        description: ID of a contractor to get invoices from
         required: false
         style: form
         explode: true
         schema:
           type: string
-          format: uuid
       responses:
         "200":
           description: success
@@ -252,13 +251,12 @@ paths:
           format: date
       - name: contractor
         in: query
-        description: UUID of a contractor to get invoices from
+        description: ID of a contractor to get invoices from
         required: false
         style: form
         explode: true
         schema:
           type: string
-          format: uuid
       responses:
         "200":
           description: success
@@ -282,13 +280,12 @@ paths:
       parameters:
       - name: id
         in: path
-        description: UUID of the invoice to get
+        description: ID of the invoice to get
         required: true
         style: simple
         explode: false
         schema:
           type: string
-          format: uuid
       responses:
         "200":
           description: success
@@ -310,13 +307,12 @@ paths:
       parameters:
       - name: id
         in: path
-        description: UUID of the invoice to update
+        description: ID of the invoice to update
         required: true
         style: simple
         explode: false
         schema:
           type: string
-          format: uuid
       requestBody:
         content:
           application/json:
@@ -343,13 +339,12 @@ paths:
       parameters:
       - name: id
         in: path
-        description: UUID of the invoice to get
+        description: ID of the invoice to get
         required: true
         style: simple
         explode: false
         schema:
           type: string
-          format: uuid
       responses:
         "200":
           description: success
@@ -421,13 +416,12 @@ paths:
       parameters:
       - name: id
         in: path
-        description: UUID of the contractor to update
+        description: ID of the contractor to update
         required: true
         style: simple
         explode: false
         schema:
           type: string
-          format: uuid
       requestBody:
         content:
           application/json:
@@ -453,13 +447,12 @@ paths:
       parameters:
       - name: id
         in: path
-        description: UUID of the contractor to delete
+        description: ID of the contractor to delete
         required: true
         style: simple
         explode: false
         schema:
           type: string
-          format: uuid
       responses:
         "200":
           description: success
@@ -528,13 +521,12 @@ paths:
       parameters:
       - name: id
         in: path
-        description: UUID of the product to update
+        description: ID of the product to update
         required: true
         style: simple
         explode: false
         schema:
           type: string
-          format: uuid
       requestBody:
         content:
           application/json:
@@ -560,13 +552,12 @@ paths:
       parameters:
       - name: id
         in: path
-        description: UUID of the product to delete
+        description: ID of the product to delete
         required: true
         style: simple
         explode: false
         schema:
           type: string
-          format: uuid
       responses:
         "200":
           description: success
@@ -628,10 +619,8 @@ components:
       properties:
         id:
           type: string
-          format: uuid
         contractorId:
           type: string
-          format: uuid
         title:
           type: string
           example: 5324/04/2021
@@ -639,7 +628,6 @@ components:
           type: array
           items:
             type: string
-            format: uuid
         created:
           type: string
           format: date-time
@@ -675,7 +663,6 @@ components:
       properties:
         id:
           type: string
-          format: uuid
         name:
           type: string
           example: straws
@@ -697,7 +684,6 @@ components:
       properties:
         id:
           type: string
-          format: uuid
         name:
           type: string
           example: Media Saturn Online Sp. z o.o.
