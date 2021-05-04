@@ -600,11 +600,7 @@ components:
       type: object
       properties:
         login:
-          type: string
-          example: email@email.com
-        password:
-          type: string
-          example: password123
+          $ref: '#/components/schemas/Login'
         company:
           $ref: '#/components/schemas/Contractor'
     NewPassword:
