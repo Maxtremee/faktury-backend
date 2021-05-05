@@ -607,16 +607,15 @@ components:
           type: string
           example: NewPassword
     InvoiceItem:
-      required:
-      - productId
-      - quantity
-      type: object
-      properties:
-        productId:
-          type: string
-        quantity:
-          type: number
-          example: 2.5
+      allOf:
+      - $ref: '#/components/schemas/Product'
+      - required:
+        - quantity
+        type: object
+        properties:
+          quantity:
+            type: number
+            example: 2.5
     Invoice:
       required:
       - contractorId
@@ -666,6 +665,7 @@ components:
           example: Płatność gotówką
     Product:
       required:
+      - currency
       - name
       - price
       - tax
@@ -682,6 +682,9 @@ components:
         tax:
           type: integer
           example: 23
+        currency:
+          type: string
+          example: PLN
     Contractor:
       required:
       - firstAddressLine
