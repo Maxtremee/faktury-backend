@@ -6,9 +6,9 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  version: 1.0.1
+  version: 0.1.0
 servers:
-- url: https://faktury-api.mzadka.me/v1
+- url: https://faktury.mzadka.me/api
   description: API Server
 security:
 - cookieAuth: []
@@ -606,6 +606,17 @@ components:
         new_password:
           type: string
           example: NewPassword
+    InvoiceItem:
+      required:
+      - productId
+      - quantity
+      type: object
+      properties:
+        productId:
+          type: string
+        quantity:
+          type: number
+          example: 2.5
     Invoice:
       required:
       - contractorId
@@ -627,7 +638,7 @@ components:
         products:
           type: array
           items:
-            type: string
+            $ref: '#/components/schemas/InvoiceItem'
         created:
           type: string
           format: date-time
@@ -650,14 +661,13 @@ components:
           type: string
           format: date
           example: 2016-08-30
-        notes:
+        info:
           type: string
           example: Płatność gotówką
     Product:
       required:
       - name
       - price
-      - quantity
       - tax
       type: object
       properties:
@@ -672,9 +682,6 @@ components:
         tax:
           type: integer
           example: 23
-        quantity:
-          type: number
-          example: 25.2
     Contractor:
       required:
       - firstAddressLine
