@@ -6,12 +6,12 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  version: 1.0.1
+  version: 0.1.0
 servers:
-- url: https://faktury-api.mzadka.me/v1
+- url: https://faktury.mzadka.me/api
   description: API Server
 security:
-- cookieAuth: []
+- bearerAuth: []
 tags:
 - name: auth
   description: Routes related to authenticated actions i.e. logging in
@@ -39,17 +39,10 @@ paths:
       responses:
         "200":
           description: successfully logged in
-          headers:
-            Set-Cookie:
-              style: simple
-              explode: false
-              schema:
-                type: string
-                example: SESSIONID=abcde12345; Path=/; HttpOnly
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Contractor'
+                $ref: '#/components/schemas/UserDetails'
         "400":
           description: wrong request
         "404":
@@ -166,13 +159,12 @@ paths:
           format: date
       - name: contractor
         in: query
-        description: UUID of a contractor to get invoices from
+        description: ID of a contractor to get invoices from
         required: false
         style: form
         explode: true
         schema:
           type: string
-          format: uuid
       responses:
         "200":
           description: success
@@ -252,13 +244,12 @@ paths:
           format: date
       - name: contractor
         in: query
-        description: UUID of a contractor to get invoices from
+        description: ID of a contractor to get invoices from
         required: false
         style: form
         explode: true
         schema:
           type: string
-          format: uuid
       responses:
         "200":
           description: success
@@ -282,13 +273,12 @@ paths:
       parameters:
       - name: id
         in: path
-        description: UUID of the invoice to get
+        description: ID of the invoice to get
         required: true
         style: simple
         explode: false
         schema:
           type: string
-          format: uuid
       responses:
         "200":
           description: success
@@ -310,13 +300,12 @@ paths:
       parameters:
       - name: id
         in: path
-        description: UUID of the invoice to update
+        description: ID of the invoice to update
         required: true
         style: simple
         explode: false
         schema:
           type: string
-          format: uuid
       requestBody:
         content:
           application/json:
@@ -343,13 +332,12 @@ paths:
       parameters:
       - name: id
         in: path
-        description: UUID of the invoice to get
+        description: ID of the invoice to get
         required: true
         style: simple
         explode: false
         schema:
           type: string
-          format: uuid
       responses:
         "200":
           description: success
@@ -421,13 +409,12 @@ paths:
       parameters:
       - name: id
         in: path
-        description: UUID of the contractor to update
+        description: ID of the contractor to update
         required: true
         style: simple
         explode: false
         schema:
           type: string
-          format: uuid
       requestBody:
         content:
           application/json:
@@ -453,13 +440,12 @@ paths:
       parameters:
       - name: id
         in: path
-        description: UUID of the contractor to delete
+        description: ID of the contractor to delete
         required: true
         style: simple
         explode: false
         schema:
           type: string
-          format: uuid
       responses:
         "200":
           description: success
@@ -528,13 +514,12 @@ paths:
       parameters:
       - name: id
         in: path
-        description: UUID of the product to update
+        description: ID of the product to update
         required: true
         style: simple
         explode: false
         schema:
           type: string
-          format: uuid
       requestBody:
         content:
           application/json:
@@ -560,13 +545,12 @@ paths:
       parameters:
       - name: id
         in: path
-        description: UUID of the product to delete
+        description: ID of the product to delete
         required: true
         style: simple
         explode: false
         schema:
           type: string
-          format: uuid
       responses:
         "200":
           description: success
@@ -580,6 +564,32 @@ paths:
           description: internal server error
 components:
   schemas:
+    Roles:
+      type: string
+      enum:
+      - USER
+      - MODERATOR
+      - ADMIN
+    UserDetails:
+      type: object
+      properties:
+        id:
+          type: string
+        login:
+          type: string
+          format: email
+        roles:
+          type: array
+          items:
+            type: string
+        company:
+          $ref: '#/components/schemas/Contractor'
+        tokenType:
+          type: string
+          example: Bearer
+        accessToken:
+          type: string
+          example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
     Login:
       required:
       - login
@@ -593,20 +603,22 @@ components:
           type: string
           example: password123
     Signup:
-      required:
-      - company
-      - login
-      - password
-      type: object
-      properties:
-        login:
-          type: string
-          example: email@email.com
-        password:
-          type: string
-          example: password123
-        company:
-          $ref: '#/components/schemas/Contractor'
+      allOf:
+      - $ref: '#/components/schemas/Login'
+      - required:
+        - company
+        type: object
+        properties:
+          company:
+            $ref: '#/components/schemas/Contractor'
+      - required:
+        - roles
+        type: object
+        properties:
+          roles:
+            type: array
+            items:
+              $ref: '#/components/schemas/Roles'
     NewPassword:
       required:
       - new_password
@@ -619,6 +631,16 @@ components:
         new_password:
           type: string
           example: NewPassword
+    InvoiceItem:
+      allOf:
+      - $ref: '#/components/schemas/Product'
+      - required:
+        - quantity
+        type: object
+        properties:
+          quantity:
+            type: number
+            example: 2.5
     Invoice:
       required:
       - contractorId
@@ -632,18 +654,15 @@ components:
       properties:
         id:
           type: string
-          format: uuid
         contractorId:
           type: string
-          format: uuid
         title:
           type: string
           example: 5324/04/2021
         products:
           type: array
           items:
-            type: string
-            format: uuid
+            $ref: '#/components/schemas/InvoiceItem'
         created:
           type: string
           format: date-time
@@ -666,20 +685,19 @@ components:
           type: string
           format: date
           example: 2016-08-30
-        notes:
+        info:
           type: string
           example: Płatność gotówką
     Product:
       required:
+      - currency
       - name
       - price
-      - quantity
       - tax
       type: object
       properties:
         id:
           type: string
-          format: uuid
         name:
           type: string
           example: straws
@@ -689,9 +707,9 @@ components:
         tax:
           type: integer
           example: 23
-        quantity:
-          type: number
-          example: 25.2
+        currency:
+          type: string
+          example: PLN
     Contractor:
       required:
       - firstAddressLine
@@ -701,7 +719,6 @@ components:
       properties:
         id:
           type: string
-          format: uuid
         name:
           type: string
           example: Media Saturn Online Sp. z o.o.
@@ -724,7 +741,7 @@ components:
           type: string
           example: PL12 3456 0000 0000 0000 0000 7890
   securitySchemes:
-    cookieAuth:
-      type: apiKey
-      name: SESSIONID
-      in: cookie
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
