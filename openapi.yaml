@@ -11,7 +11,7 @@ servers:
 - url: https://faktury.mzadka.me/api
   description: API Server
 security:
-- OAuth2PasswordBearer: []
+- bearerAuth: []
 tags:
 - name: auth
   description: Routes related to authenticated actions i.e. logging in
@@ -716,9 +716,7 @@ components:
           type: string
           example: PL12 3456 0000 0000 0000 0000 7890
   securitySchemes:
-    OAuth2PasswordBearer:
-      type: oauth2
-      flows:
-        password:
-          tokenUrl: login
-          scopes: {}
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
