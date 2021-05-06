@@ -11,7 +11,7 @@ servers:
 - url: https://faktury.mzadka.me/api
   description: API Server
 security:
-- cookieAuth: []
+- bearerAuth: []
 tags:
 - name: auth
   description: Routes related to authenticated actions i.e. logging in
@@ -40,12 +40,12 @@ paths:
         "200":
           description: successfully logged in
           headers:
-            Set-Cookie:
+            Authorization:
               style: simple
               explode: false
               schema:
                 type: string
-                example: SESSIONID=abcde12345; Path=/; HttpOnly
+                example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
           content:
             application/json:
               schema:
@@ -716,7 +716,7 @@ components:
           type: string
           example: PL12 3456 0000 0000 0000 0000 7890
   securitySchemes:
-    cookieAuth:
-      type: apiKey
-      name: SESSIONID
-      in: cookie
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
