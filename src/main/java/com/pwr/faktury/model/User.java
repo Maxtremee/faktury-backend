@@ -1,33 +1,47 @@
 package com.pwr.faktury.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
-import java.util.UUID;
+import java.util.Set;
+
+import javax.validation.constraints.NotBlank;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
 
+@Document(collection = "users")
 public class User {
     @Id
     private String id;
+
+    @DBRef
+    private Set<Role> roles = new HashSet<>();
     
-    private Login login;
+    @NotBlank
+    private String login;
 
+    @NotBlank
+    private String password;
+
+    @NotBlank
     private Contractor personal_data;
-
-    private List<UUID> contractors = new ArrayList<>();
-
-    private List<UUID> products = new ArrayList<>();
-
-    private List<UUID> invoices = new ArrayList<>();
+    
+    private Set<Contractor> contractors = new HashSet<>();
+    
+    private Set<Product> products = new HashSet<>();
+   
+    private Set<Invoice> invoices = new HashSet<>();
 
 
     public User() {
     }
 
-    public User(String id, Login login, Contractor personal_data, List<UUID> contractors, List<UUID> products, List<UUID> invoices) {
+    public User(String id, Set<Role> roles, String login, String password, Contractor personal_data, Set<Contractor> contractors, Set<Product> products, Set<Invoice> invoices) {
         this.id = id;
+        this.roles = roles;
         this.login = login;
+        this.password = password;
         this.personal_data = personal_data;
         this.contractors = contractors;
         this.products = products;
@@ -42,12 +56,28 @@ public class User {
         this.id = id;
     }
 
-    public Login getLogin() {
+    public Set<Role> getRoles() {
+        return this.roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
+    public String getLogin() {
         return this.login;
     }
 
-    public void setLogin(Login login) {
+    public void setLogin(String login) {
         this.login = login;
+    }
+
+    public String getPassword() {
+        return this.password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Contractor getPersonal_data() {
@@ -58,27 +88,27 @@ public class User {
         this.personal_data = personal_data;
     }
 
-    public List<UUID> getContractors() {
+    public Set<Contractor> getContractors() {
         return this.contractors;
     }
 
-    public void setContractors(List<UUID> contractors) {
+    public void setContractors(Set<Contractor> contractors) {
         this.contractors = contractors;
     }
 
-    public List<UUID> getProducts() {
+    public Set<Product> getProducts() {
         return this.products;
     }
 
-    public void setProducts(List<UUID> products) {
+    public void setProducts(Set<Product> products) {
         this.products = products;
     }
 
-    public List<UUID> getInvoices() {
+    public Set<Invoice> getInvoices() {
         return this.invoices;
     }
 
-    public void setInvoices(List<UUID> invoices) {
+    public void setInvoices(Set<Invoice> invoices) {
         this.invoices = invoices;
     }
 
@@ -87,8 +117,18 @@ public class User {
         return this;
     }
 
-    public User login(Login login) {
+    public User roles(Set<Role> roles) {
+        setRoles(roles);
+        return this;
+    }
+
+    public User login(String login) {
         setLogin(login);
+        return this;
+    }
+
+    public User password(String password) {
+        setPassword(password);
         return this;
     }
 
@@ -97,17 +137,17 @@ public class User {
         return this;
     }
 
-    public User contractors(List<UUID> contractors) {
+    public User contractors(Set<Contractor> contractors) {
         setContractors(contractors);
         return this;
     }
 
-    public User products(List<UUID> products) {
+    public User products(Set<Product> products) {
         setProducts(products);
         return this;
     }
 
-    public User invoices(List<UUID> invoices) {
+    public User invoices(Set<Invoice> invoices) {
         setInvoices(invoices);
         return this;
     }
@@ -120,24 +160,27 @@ public class User {
             return false;
         }
         User user = (User) o;
-        return Objects.equals(id, user.id) && Objects.equals(login, user.login) && Objects.equals(personal_data, user.personal_data) && Objects.equals(contractors, user.contractors) && Objects.equals(products, user.products) && Objects.equals(invoices, user.invoices);
+        return Objects.equals(id, user.id) && Objects.equals(roles, user.roles) && Objects.equals(login, user.login) && Objects.equals(password, user.password) && Objects.equals(personal_data, user.personal_data) && Objects.equals(contractors, user.contractors) && Objects.equals(products, user.products) && Objects.equals(invoices, user.invoices);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, login, personal_data, contractors, products, invoices);
+        return Objects.hash(id, roles, login, password, personal_data, contractors, products, invoices);
     }
 
     @Override
     public String toString() {
         return "{" +
             " id='" + getId() + "'" +
+            ", roles='" + getRoles() + "'" +
             ", login='" + getLogin() + "'" +
+            ", password='" + getPassword() + "'" +
             ", personal_data='" + getPersonal_data() + "'" +
             ", contractors='" + getContractors() + "'" +
             ", products='" + getProducts() + "'" +
             ", invoices='" + getInvoices() + "'" +
             "}";
     }
+    
 
 }
