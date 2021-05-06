@@ -564,6 +564,12 @@ paths:
           description: internal server error
 components:
   schemas:
+    Roles:
+      type: string
+      enum:
+      - USER
+      - MODERATOR
+      - ADMIN
     UserDetails:
       type: object
       properties:
@@ -605,6 +611,14 @@ components:
         properties:
           company:
             $ref: '#/components/schemas/Contractor'
+      - required:
+        - roles
+        type: object
+        properties:
+          roles:
+            type: array
+            items:
+              $ref: '#/components/schemas/Roles'
     NewPassword:
       required:
       - new_password
