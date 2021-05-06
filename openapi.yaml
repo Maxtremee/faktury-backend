@@ -39,17 +39,10 @@ paths:
       responses:
         "200":
           description: successfully logged in
-          headers:
-            Authorization:
-              style: simple
-              explode: false
-              schema:
-                type: string
-                example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Contractor'
+                $ref: '#/components/schemas/UserDetails'
         "400":
           description: wrong request
         "404":
@@ -571,6 +564,26 @@ paths:
           description: internal server error
 components:
   schemas:
+    UserDetails:
+      type: object
+      properties:
+        id:
+          type: string
+        login:
+          type: string
+          format: email
+        roles:
+          type: array
+          items:
+            type: string
+        company:
+          $ref: '#/components/schemas/Contractor'
+        tokenType:
+          type: string
+          example: Bearer
+        accessToken:
+          type: string
+          example: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
     Login:
       required:
       - login
@@ -584,16 +597,14 @@ components:
           type: string
           example: password123
     Signup:
-      required:
-      - company
-      - login
-      - password
-      type: object
-      properties:
-        login:
-          $ref: '#/components/schemas/Login'
-        company:
-          $ref: '#/components/schemas/Contractor'
+      allOf:
+      - $ref: '#/components/schemas/Login'
+      - required:
+        - company
+        type: object
+        properties:
+          schema:
+            $ref: '#/components/schemas/Contractor'
     NewPassword:
       required:
       - new_password
