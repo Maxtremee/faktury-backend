@@ -27,10 +27,13 @@ public class User {
     @NotBlank
     private Contractor personal_data;
     
+    @DBRef
     private Set<Contractor> contractors = new HashSet<>();
-    
+
+    @DBRef
     private Set<Product> products = new HashSet<>();
-   
+    
+    @DBRef
     private Set<Invoice> invoices = new HashSet<>();
 
 

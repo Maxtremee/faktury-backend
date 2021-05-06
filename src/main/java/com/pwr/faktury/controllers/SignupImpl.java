@@ -1,11 +1,13 @@
 package com.pwr.faktury.controllers;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.pwr.faktury.api.SignupApiDelegate;
 import com.pwr.faktury.model.ERole;
 import com.pwr.faktury.model.Role;
+import com.pwr.faktury.model.Roles;
 import com.pwr.faktury.model.Signup;
 import com.pwr.faktury.model.User;
 import com.pwr.faktury.repositories.RoleRepository;
@@ -47,10 +49,34 @@ public class SignupImpl implements SignupApiDelegate {
         user.setPassword(encoder.encode(signup.getPassword()));
         user.setPersonal_data(signup.getCompany());
 
+        List<Roles> strRoles = signup.getRoles();
         Set<Role> roles = new HashSet<>();
-        Role userRole = roleRepository.findByName(ERole.USER)
-                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-        roles.add(userRole);
+        if (strRoles == null) {
+            Role userRole = roleRepository.findByName(ERole.USER)
+                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+            roles.add(userRole);
+        } else {
+            strRoles.forEach(role -> {
+                switch (role) {
+                    case ADMIN:
+                        Role adminRole = roleRepository.findByName(ERole.ADMIN)
+                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        roles.add(adminRole);
+
+                        break;
+                    case MODERATOR:
+                        Role modRole = roleRepository.findByName(ERole.MODERATOR)
+                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        roles.add(modRole);
+
+                        break;
+                    default:
+                        Role userRole = roleRepository.findByName(ERole.USER)
+                                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                        roles.add(userRole);
+                }
+            });
+        }
         user.setRoles(roles);
         
         userRepository.save(user);
