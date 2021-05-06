@@ -603,7 +603,7 @@ components:
         - company
         type: object
         properties:
-          schema:
+          company:
             $ref: '#/components/schemas/Contractor'
     NewPassword:
       required:
