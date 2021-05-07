@@ -73,6 +73,23 @@ paths:
         "500":
           description: internal server error
       security: []
+  /logout:
+    get:
+      tags:
+      - auth
+      summary: logout
+      description: |
+        Logout user with simple GET request - it will deauthenticate the token
+      operationId: logout
+      responses:
+        "200":
+          description: successfully created account
+        "400":
+          description: wrong request
+        "409":
+          description: user already exists
+        "500":
+          description: internal server error
   /change-password:
     put:
       tags:
@@ -565,11 +582,10 @@ paths:
 components:
   schemas:
     Roles:
-      type: string
-      enum:
-      - USER
-      - MODERATOR
-      - ADMIN
+      type: array
+      description: "Possible values: [USER, MODERATOR, ADMIN]"
+      items:
+        type: string
     UserDetails:
       type: object
       properties:
@@ -616,9 +632,7 @@ components:
         type: object
         properties:
           roles:
-            type: array
-            items:
-              $ref: '#/components/schemas/Roles'
+            $ref: '#/components/schemas/Roles'
     NewPassword:
       required:
       - new_password
