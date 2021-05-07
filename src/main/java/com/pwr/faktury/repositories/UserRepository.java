@@ -15,6 +15,6 @@ public interface UserRepository extends MongoRepository<User, String> {
     
     Boolean existsByLogin(@Param("login") String login);
     
-    @Query("{'products': { 'name': ?0 } }")
-    Boolean productExistsByName(@Param("name") String name);
+    @Query("{'products.$id': ?0 }")
+    Boolean productExistsByName(String name);
 }

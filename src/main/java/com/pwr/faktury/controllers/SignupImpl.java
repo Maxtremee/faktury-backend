@@ -47,7 +47,7 @@ public class SignupImpl implements SignupApiDelegate {
         User user = new User();
         user.setLogin(signup.getLogin());
         user.setPassword(encoder.encode(signup.getPassword()));
-        user.setPersonal_data((ContractorAdapter) signup.getCompany());
+        user.setPersonal_data(signup.getCompany());
 
         List<String> strRoles = signup.getRoles();
         Set<Role> roles = new HashSet<>();

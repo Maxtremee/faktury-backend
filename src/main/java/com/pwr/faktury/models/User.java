@@ -9,7 +9,6 @@ import javax.validation.constraints.NotBlank;
 import com.pwr.faktury.model.Contractor;
 import com.pwr.faktury.model.Invoice;
 import com.pwr.faktury.model.Product;
-import com.pwr.faktury.models.adapters.ContractorAdapter;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -30,7 +29,7 @@ public class User {
     private String password;
 
     @NotBlank
-    private ContractorAdapter personal_data;
+    private Contractor personal_data;
     
     @DBRef
     private Set<Contractor> contractors = new HashSet<>();
@@ -45,7 +44,7 @@ public class User {
     public User() {
     }
 
-    public User(String id, Set<Role> roles, String login, String password, ContractorAdapter personal_data, Set<Contractor> contractors, Set<Product> products, Set<Invoice> invoices) {
+    public User(String id, Set<Role> roles, String login, String password, Contractor personal_data, Set<Contractor> contractors, Set<Product> products, Set<Invoice> invoices) {
         this.id = id;
         this.roles = roles;
         this.login = login;
@@ -88,11 +87,11 @@ public class User {
         this.password = password;
     }
 
-    public ContractorAdapter getPersonal_data() {
+    public Contractor getPersonal_data() {
         return this.personal_data;
     }
 
-    public void setPersonal_data(ContractorAdapter personal_data) {
+    public void setPersonal_data(Contractor personal_data) {
         this.personal_data = personal_data;
     }
 
@@ -140,7 +139,7 @@ public class User {
         return this;
     }
 
-    public User personal_data(ContractorAdapter personal_data) {
+    public User personal_data(Contractor personal_data) {
         setPersonal_data(personal_data);
         return this;
     }
@@ -189,5 +188,6 @@ public class User {
             ", invoices='" + getInvoices() + "'" +
             "}";
     }
+
 
 }
