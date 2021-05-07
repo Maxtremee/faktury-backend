@@ -2,7 +2,7 @@ package com.pwr.faktury.repositories;
 
 import java.util.Optional;
 
-import com.pwr.faktury.model.User;
+import com.pwr.faktury.models.User;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;

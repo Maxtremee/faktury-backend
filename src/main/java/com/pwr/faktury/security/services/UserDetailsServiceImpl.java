@@ -1,6 +1,6 @@
 package com.pwr.faktury.security.services;
 
-import com.pwr.faktury.model.User;
+import com.pwr.faktury.models.User;
 import com.pwr.faktury.repositories.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;

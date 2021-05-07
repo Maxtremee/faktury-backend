@@ -6,9 +6,8 @@ import java.util.stream.Collectors;
 
 import com.pwr.faktury.api.LoginApiDelegate;
 import com.pwr.faktury.model.Login;
-import com.pwr.faktury.model.User;
 import com.pwr.faktury.model.UserDetails;
-import com.pwr.faktury.repositories.RoleRepository;
+import com.pwr.faktury.models.User;
 import com.pwr.faktury.repositories.UserRepository;
 import com.pwr.faktury.security.jwt.JwtUtils;
 import com.pwr.faktury.security.services.UserDetailsImpl;
@@ -20,7 +19,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,14 +30,7 @@ public class LoginImpl implements LoginApiDelegate {
     UserRepository userRepository;
 
     @Autowired
-    RoleRepository roleRepository;
-
-    @Autowired
-    PasswordEncoder encoder;
-
-    @Autowired
     JwtUtils jwtUtils;
-
 
     @Override
     public ResponseEntity<UserDetails> login(Login login) {
