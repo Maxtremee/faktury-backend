@@ -8,7 +8,7 @@ info:
     url: http://www.apache.org/licenses/LICENSE-2.0.html
   version: 1.0.0
 servers:
-- url: https://faktury-java.herokuapp.com/api
+- url: https://faktury-backend.herokuapp.com/api
   description: API Server
 security:
 - bearerAuth: []
@@ -627,9 +627,7 @@ components:
         properties:
           company:
             $ref: '#/components/schemas/Contractor'
-      - required:
-        - roles
-        type: object
+      - type: object
         properties:
           roles:
             $ref: '#/components/schemas/Roles'
@@ -657,7 +655,7 @@ components:
             example: 2.5
     Invoice:
       required:
-      - contractorId
+      - contractor
       - created
       - dueDate
       - issueDate
@@ -668,8 +666,8 @@ components:
       properties:
         id:
           type: string
-        contractorId:
-          type: string
+        contractor:
+          $ref: '#/components/schemas/Contractor'
         title:
           type: string
           example: 5324/04/2021
@@ -724,6 +722,9 @@ components:
         currency:
           type: string
           example: PLN
+        unit:
+          type: string
+          example: szt.
     Contractor:
       required:
       - firstAddressLine
