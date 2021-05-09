@@ -1,11 +1,8 @@
 package com.pwr.faktury.controllers;
 
-import java.util.Optional;
-
 import com.pwr.faktury.api.ProductApiDelegate;
 import com.pwr.faktury.model.Product;
 import com.pwr.faktury.models.User;
-import com.pwr.faktury.models.adapters.ProductAdapter;
 import com.pwr.faktury.repositories.ProductRepository;
 import com.pwr.faktury.repositories.UserRepository;
 import com.pwr.faktury.security.services.UserService;
@@ -32,18 +29,17 @@ public class ProductImpl implements ProductApiDelegate {
 
     @Override
     public ResponseEntity<Void> newProduct(Product product) {
-        ProductAdapter productAdapter = new ProductAdapter(product);
         User user = userService.getUser();
         if (user != null) {
             if (!user.getProducts().isEmpty()) {
                 for (Product temp : user.getProducts()) {
-                    if (temp.getName().equals(productAdapter.get().getName())) {
+                    if (temp.getName().equals(product.getName())) {
                         return new ResponseEntity<Void>(HttpStatus.CONFLICT);
                     }
                 }
             }
-            productRepository.save(productAdapter.get());
-            user.getProducts().add(productAdapter.get());
+            productRepository.save(product);
+            user.getProducts().add(product);
             userRepository.save(user);
             return new ResponseEntity<Void>(HttpStatus.CREATED);
             

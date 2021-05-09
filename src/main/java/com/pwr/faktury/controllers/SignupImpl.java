@@ -9,7 +9,6 @@ import com.pwr.faktury.models.ERole;
 import com.pwr.faktury.models.Role;
 import com.pwr.faktury.model.Signup;
 import com.pwr.faktury.models.User;
-import com.pwr.faktury.models.adapters.ContractorAdapter;
 import com.pwr.faktury.repositories.RoleRepository;
 import com.pwr.faktury.repositories.UserRepository;
 import com.pwr.faktury.security.jwt.JwtUtils;
