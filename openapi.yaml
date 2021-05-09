@@ -107,8 +107,6 @@ paths:
           description: successfully changed password
         "400":
           description: wrong request
-        "403":
-          description: forbidden
         "500":
           description: internal server error
   /change-personal-info:
@@ -128,8 +126,6 @@ paths:
           description: successfully changed personal info
         "400":
           description: wrong request
-        "403":
-          description: forbidden
         "500":
           description: internal server error
   /invoice:
@@ -193,8 +189,6 @@ paths:
                   $ref: '#/components/schemas/Invoice'
         "400":
           description: wrong request
-        "403":
-          description: forbidden
         "500":
           description: internal server error
     post:
@@ -213,8 +207,6 @@ paths:
           description: invoice created
         "400":
           description: wrong request
-        "403":
-          description: forbidden
         "500":
           description: internal server error
   /invoice/pdf:
@@ -277,8 +269,6 @@ paths:
                 format: binary
         "400":
           description: wrong request
-        "403":
-          description: forbidden
         "500":
           description: internal server error
   /invoice/{id}:
@@ -334,8 +324,6 @@ paths:
           description: success
         "204":
           description: no content
-        "403":
-          description: forbidden
         "404":
           description: no such contractor
         "500":
@@ -418,6 +406,33 @@ paths:
         "500":
           description: internal server error
   /contractor/{id}:
+    get:
+      tags:
+      - contractor
+      summary: get contractor data with ID
+      operationId: getContractorWithId
+      parameters:
+      - name: id
+        in: path
+        description: ID of the contractor to get
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contractor'
+        "400":
+          description: wrong request
+        "404":
+          description: contractor not found
+        "500":
+          description: internal server error
     put:
       tags:
       - contractor
@@ -443,8 +458,6 @@ paths:
           description: success
         "204":
           description: no content
-        "403":
-          description: forbidden
         "404":
           description: no such contractor
         "500":
@@ -468,8 +481,6 @@ paths:
           description: success
         "400":
           description: wrong request
-        "403":
-          description: forbidden
         "404":
           description: no such contractor
         "500":
@@ -488,7 +499,7 @@ paths:
         explode: true
         schema:
           type: string
-          example: jabłka
+          example: straws
       responses:
         "200":
           description: success
@@ -523,6 +534,33 @@ paths:
         "500":
           description: internal server error
   /product/{id}:
+    get:
+      tags:
+      - product
+      summary: get product data with ID
+      operationId: getProductWithId
+      parameters:
+      - name: id
+        in: path
+        description: ID of the product to get
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        "400":
+          description: wrong request
+        "404":
+          description: product not found
+        "500":
+          description: internal server error
     put:
       tags:
       - product
@@ -571,8 +609,6 @@ paths:
           description: success
         "400":
           description: wrong request
-        "403":
-          description: forbidden
         "404":
           description: no such product
         "500":
