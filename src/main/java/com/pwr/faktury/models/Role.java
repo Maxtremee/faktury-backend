@@ -1,4 +1,4 @@
-package com.pwr.faktury.model;
+package com.pwr.faktury.models;
 
 import java.util.Objects;
 

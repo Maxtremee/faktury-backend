@@ -1,10 +1,14 @@
-package com.pwr.faktury.model;
+package com.pwr.faktury.models;
 
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 import javax.validation.constraints.NotBlank;
+
+import com.pwr.faktury.model.Contractor;
+import com.pwr.faktury.model.Invoice;
+import com.pwr.faktury.model.Product;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -32,7 +36,7 @@ public class User {
 
     @DBRef
     private Set<Product> products = new HashSet<>();
-    
+
     @DBRef
     private Set<Invoice> invoices = new HashSet<>();
 
@@ -184,6 +188,6 @@ public class User {
             ", invoices='" + getInvoices() + "'" +
             "}";
     }
-    
+
 
 }

@@ -6,9 +6,9 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-  version: 0.1.0
+  version: 1.0.0
 servers:
-- url: https://faktury.mzadka.me/api
+- url: https://faktury-backend.herokuapp.com/api
   description: API Server
 security:
 - bearerAuth: []
@@ -73,6 +73,23 @@ paths:
         "500":
           description: internal server error
       security: []
+  /logout:
+    get:
+      tags:
+      - auth
+      summary: logout
+      description: |
+        Logout user with simple GET request - it will deauthenticate the token
+      operationId: logout
+      responses:
+        "200":
+          description: successfully created account
+        "400":
+          description: wrong request
+        "409":
+          description: user already exists
+        "500":
+          description: internal server error
   /change-password:
     put:
       tags:
@@ -565,11 +582,10 @@ paths:
 components:
   schemas:
     Roles:
-      type: string
-      enum:
-      - USER
-      - MODERATOR
-      - ADMIN
+      type: array
+      description: "Possible values: [USER, MODERATOR, ADMIN]"
+      items:
+        type: string
     UserDetails:
       type: object
       properties:
@@ -611,14 +627,10 @@ components:
         properties:
           company:
             $ref: '#/components/schemas/Contractor'
-      - required:
-        - roles
-        type: object
+      - type: object
         properties:
           roles:
-            type: array
-            items:
-              $ref: '#/components/schemas/Roles'
+            $ref: '#/components/schemas/Roles'
     NewPassword:
       required:
       - new_password
@@ -643,7 +655,7 @@ components:
             example: 2.5
     Invoice:
       required:
-      - contractorId
+      - contractor
       - created
       - dueDate
       - issueDate
@@ -654,8 +666,8 @@ components:
       properties:
         id:
           type: string
-        contractorId:
-          type: string
+        contractor:
+          $ref: '#/components/schemas/Contractor'
         title:
           type: string
           example: 5324/04/2021
@@ -710,6 +722,9 @@ components:
         currency:
           type: string
           example: PLN
+        unit:
+          type: string
+          example: szt.
     Contractor:
       required:
       - firstAddressLine
