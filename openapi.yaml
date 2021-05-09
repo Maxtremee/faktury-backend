@@ -26,7 +26,7 @@ paths:
     post:
       tags:
       - auth
-      summary: logs user in
+      summary: login
       description: |
         If supplied with existing login and password generates session and grants user access to service
       operationId: login
@@ -373,7 +373,7 @@ paths:
     get:
       tags:
       - contractor
-      summary: search for existing contractrors (autocomplete)
+      summary: search for existing contractrors - retrieves all if searchstr not specified
       operationId: getContractors
       parameters:
       - name: searchstr
@@ -478,7 +478,7 @@ paths:
     get:
       tags:
       - product
-      summary: search for existing products (autocomplete)
+      summary: search for existing products - retrieves all if searchstr not specified
       operationId: getProducts
       parameters:
       - name: searchstr
@@ -548,8 +548,6 @@ paths:
           description: success
         "204":
           description: no content
-        "403":
-          description: forbidden
         "404":
           description: no such product
         "500":
