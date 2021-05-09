@@ -2,7 +2,6 @@ package com.pwr.faktury.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import com.pwr.faktury.api.ProductApiDelegate;
 import com.pwr.faktury.model.Product;
@@ -14,7 +13,6 @@ import com.pwr.faktury.security.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -27,9 +25,6 @@ public class ProductImpl implements ProductApiDelegate {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    AuthenticationManager authenticationManager;
 
     @Override
     public ResponseEntity<Void> deleteProduct(String id) {
@@ -91,7 +86,6 @@ public class ProductImpl implements ProductApiDelegate {
             user.getProducts().add(product);
             userRepository.save(user);
             return new ResponseEntity<Void>(HttpStatus.CREATED);
-
         } else {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -101,8 +95,9 @@ public class ProductImpl implements ProductApiDelegate {
     public ResponseEntity<Void> updateProduct(String id, Product product) {
         User user = userService.getUser();
         if (user != null) {
-            Optional<Product> temp = productRepository.findById(id);
-            if (temp.isPresent()) {
+            //Optional<Product> temp = productRepository.findById(id);
+            //if (temp.isPresent()) {
+            if (userRepository.productExistsById(user.getId(), id) != null) {
                 product.setId(id);
                 productRepository.save(product);
                 return new ResponseEntity<Void>(HttpStatus.OK);
