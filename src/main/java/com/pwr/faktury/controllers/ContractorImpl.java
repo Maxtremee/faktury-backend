@@ -1,5 +1,10 @@
 package com.pwr.faktury.controllers;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import com.pwr.faktury.api.ContractorApiDelegate;
 import com.pwr.faktury.model.Contractor;
 import com.pwr.faktury.models.User;
@@ -22,20 +27,95 @@ public class ContractorImpl implements ContractorApiDelegate {
     private UserRepository userRepository;
 
     @Override
+    public ResponseEntity<Void> deleteContractor(String id) {
+        User user = userService.getUser();
+        if (user != null) {
+            Optional<Contractor> contractor_to_check = user.getContractors().stream().filter(c -> c.getId().equals(id))
+                    .findAny();
+            if (contractor_to_check.isPresent()) {
+                contractorRepository.deleteById(id);
+                user.getContractors().remove(contractor_to_check.get());
+                userRepository.save(user);
+                return new ResponseEntity<Void>(HttpStatus.OK);
+            } else {
+                return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
+            }
+        } else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @Override
+    public ResponseEntity<Contractor> getContractorWithId(String id) {
+        User user = userService.getUser();
+        if (user != null) {
+            Optional<Contractor> contractor_to_get = user.getContractors().stream().filter(c -> c.getId().equals(id))
+                    .findAny();
+            if (contractor_to_get.isPresent()) {
+                return new ResponseEntity<>(contractor_to_get.get(), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+    }
+    
+    @Override
+    public ResponseEntity<List<Contractor>> getContractors(String searchstr) {
+        User user = userService.getUser();
+        if (user != null) {
+            // return all if searchstr empty
+            if (searchstr == " " | searchstr.isEmpty()) {
+                return new ResponseEntity<>(new ArrayList<Contractor>(user.getContractors()), HttpStatus.OK);
+            }
+            // filter products with searchstr
+            List<Contractor> foundContractors = user.getContractors().stream().filter(c -> c.getName().contains(searchstr))
+                    .collect(Collectors.toList());
+            // if none found return 404
+            if (foundContractors.size() > 0) {
+                return new ResponseEntity<>(foundContractors, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @Override
     public ResponseEntity<Void> newContractor(Contractor contractor) {
         User user = userService.getUser();
         if (user != null) {
             if (!user.getContractors().isEmpty()) {
-                for (Contractor temp : user.getContractors()) {
-                    if (temp.getNip().equals(contractor.getNip())) {
-                        return new ResponseEntity<Void>(HttpStatus.CONFLICT);
-                    }
+                Optional<Contractor> product_to_check = user.getContractors().stream()
+                        .filter(c -> c.getName().equals(contractor.getName())).findAny();
+                if (product_to_check.isPresent()) {
+                    return new ResponseEntity<>(HttpStatus.CONFLICT);
                 }
             }
             contractorRepository.save(contractor);
             user.getContractors().add(contractor);
             userRepository.save(user);
-            return new ResponseEntity<Void>(HttpStatus.CREATED);
+            return new ResponseEntity<>(HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @Override
+    public ResponseEntity<Void> updateContractor(String id, Contractor contractor) {
+        User user = userService.getUser();
+        if (user != null) {
+            Optional<Contractor> contractor_to_update = user.getContractors().stream().filter(c -> c.getId().equals(id))
+                    .findAny();
+            if (contractor_to_update.isPresent()) {
+                contractor.setId(id);
+                contractorRepository.save(contractor);
+                return new ResponseEntity<>(HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
         } else {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }

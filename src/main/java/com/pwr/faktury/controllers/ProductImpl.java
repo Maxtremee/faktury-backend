@@ -2,6 +2,8 @@ package com.pwr.faktury.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.pwr.faktury.api.ProductApiDelegate;
 import com.pwr.faktury.model.Product;
@@ -30,15 +32,32 @@ public class ProductImpl implements ProductApiDelegate {
     public ResponseEntity<Void> deleteProduct(String id) {
         User user = userService.getUser();
         if (user != null) {
-            for (Product temp : user.getProducts()) {
-                if (temp.getId().equals(id)) {
-                    productRepository.deleteById(id);
-                    user.getProducts().remove(temp);
-                    userRepository.save(user);
-                    return new ResponseEntity<Void>(HttpStatus.OK);
-                }
+            Optional<Product> product_to_check = user.getProducts().stream()
+                    .filter(p -> p.getId().equals(id)).findAny();
+            if (product_to_check.isPresent()) {
+                productRepository.deleteById(id);
+                user.getProducts().remove(product_to_check.get());
+                userRepository.save(user);
+                return new ResponseEntity<>(HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
-            return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
+        } else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @Override
+    public ResponseEntity<Product> getProductWithId(String id) {
+        User user = userService.getUser();
+        if (user != null) {
+            Optional<Product> product_to_get = user.getProducts().stream().filter(p -> p.getId().equals(id))
+                    .findAny();
+            if (product_to_get.isPresent()) {
+                return new ResponseEntity<>(product_to_get.get(), HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
         } else {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -49,17 +68,12 @@ public class ProductImpl implements ProductApiDelegate {
         User user = userService.getUser();
         if (user != null) {
             //return all if searchstr empty
-            if (searchstr == "" | searchstr.isEmpty()) {
+            if (searchstr == " " | searchstr.isEmpty()) {
                 return new ResponseEntity<>(new ArrayList<Product>(user.getProducts()), HttpStatus.OK);
             }
-
             //filter products with searchstr
-            List<Product> foundProducts = new ArrayList<>();
-            for (Product temp : user.getProducts()) {
-                if (temp.getName().contains(searchstr)) {
-                    foundProducts.add(temp);
-                }
-            }
+            List<Product> foundProducts = user.getProducts().stream().filter(p -> p.getName().contains(searchstr))
+                    .collect(Collectors.toList());
             //if none found return 404
             if (foundProducts.size() > 0) {
                 return new ResponseEntity<>(foundProducts, HttpStatus.OK);
@@ -76,16 +90,16 @@ public class ProductImpl implements ProductApiDelegate {
         User user = userService.getUser();
         if (user != null) {
             if (!user.getProducts().isEmpty()) {
-                for (Product temp : user.getProducts()) {
-                    if (temp.getName().equals(product.getName())) {
-                        return new ResponseEntity<Void>(HttpStatus.CONFLICT);
-                    }
+                Optional<Product> product_to_check = user.getProducts().stream()
+                        .filter(p -> p.getName().equals(product.getName())).findAny();
+                if (product_to_check.isPresent()) {
+                    return new ResponseEntity<>(HttpStatus.CONFLICT);
                 }
             }
             productRepository.save(product);
             user.getProducts().add(product);
             userRepository.save(user);
-            return new ResponseEntity<Void>(HttpStatus.CREATED);
+            return new ResponseEntity<>(HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -95,14 +109,14 @@ public class ProductImpl implements ProductApiDelegate {
     public ResponseEntity<Void> updateProduct(String id, Product product) {
         User user = userService.getUser();
         if (user != null) {
-            //Optional<Product> temp = productRepository.findById(id);
-            //if (temp.isPresent()) {
-            if (userRepository.productExistsById(user.getId(), id) != null) {
+            Optional<Product> product_to_update = user.getProducts().stream().filter(p -> p.getId().equals(id))
+                    .findAny();
+            if(product_to_update.isPresent()){
                 product.setId(id);
                 productRepository.save(product);
-                return new ResponseEntity<Void>(HttpStatus.OK);
+                return new ResponseEntity<>(HttpStatus.OK);
             } else {
-                return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
         } else {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
