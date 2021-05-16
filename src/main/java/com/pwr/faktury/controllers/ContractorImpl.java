@@ -15,7 +15,9 @@ import com.pwr.faktury.security.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ContractorImpl implements ContractorApiDelegate {
     @Autowired
     private UserService userService;
@@ -72,12 +74,7 @@ public class ContractorImpl implements ContractorApiDelegate {
             // filter products with searchstr
             List<Contractor> foundContractors = user.getContractors().stream().filter(c -> c.getName().contains(searchstr))
                     .collect(Collectors.toList());
-            // if none found return 404
-            if (foundContractors.size() > 0) {
-                return new ResponseEntity<>(foundContractors, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
+            return new ResponseEntity<>(foundContractors, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }

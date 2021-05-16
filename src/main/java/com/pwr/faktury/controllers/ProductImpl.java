@@ -74,12 +74,7 @@ public class ProductImpl implements ProductApiDelegate {
             //filter products with searchstr
             List<Product> foundProducts = user.getProducts().stream().filter(p -> p.getName().contains(searchstr))
                     .collect(Collectors.toList());
-            //if none found return 404
-            if (foundProducts.size() > 0) {
-                return new ResponseEntity<>(foundProducts, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
+            return new ResponseEntity<>(foundProducts, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
