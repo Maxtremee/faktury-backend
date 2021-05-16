@@ -361,7 +361,8 @@ paths:
     get:
       tags:
       - contractor
-      summary: search for existing contractrors - retrieves all if searchstr not specified
+      summary: |
+        search for existing contractrors - retrieves all if searchstr blank (length = 0 or just a space)
       operationId: getContractors
       parameters:
       - name: searchstr
@@ -489,7 +490,8 @@ paths:
     get:
       tags:
       - product
-      summary: search for existing products - retrieves all if searchstr not specified
+      summary: |
+        search for existing products - retrieves all if searchstr blank (length = 0 or just a space)
       operationId: getProducts
       parameters:
       - name: searchstr
