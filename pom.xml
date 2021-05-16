@@ -118,6 +118,7 @@
                 			</supportingFilesToGenerate>
 							<configOptions>
 								<delegatePattern>true</delegatePattern>
+								<dateLibrary>java8-localdatetime</dateLibrary>
 							</configOptions>
 						</configuration>
 					</execution>
