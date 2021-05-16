@@ -1,7 +1,9 @@
 package com.pwr.faktury.controllers;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -53,27 +55,31 @@ public class InvoiceImpl implements InvoiceApiDelegate {
     }
 
     @Override
-    public ResponseEntity<List<Invoice>> getInvoices(String name,
+    public ResponseEntity<List<Invoice>> getInvoices(String title,
     Integer quantity,
     LocalDate before,
     LocalDate after,
     String contractor) {
         User user = userService.getUser();
         if (user != null) {
-            List<Invoice> invoices = new ArrayList<>(user.getInvoices());
-            List<InvoiceFilter> filters = new ArrayList<>();
+            Set<Invoice> invoices = user.getInvoices();
+            Set<InvoiceFilter> filters = new HashSet<>();
+            if (title != null) {
+                filters.add(InvoiceFilter.title(title));
+            }
             if (before != null) {
                 filters.add(InvoiceFilter.before(before));
             }
             if (after != null) {
                 filters.add(InvoiceFilter.after(after));
             }
-            if (contractor != null | contractor == "") {
+            if (contractor != null) {
                 filters.add(InvoiceFilter.contractor(contractor));
             }
-            final InvoiceFilter combinedFilters = filters.stream().reduce(v -> v, InvoiceFilter::combine);
-            combinedFilters.apply(invoices);
-            return new ResponseEntity<>(invoices, HttpStatus.OK);
+            System.out.println(filters);
+            final InvoiceFilter combinedFilters = filters.stream().reduce(i -> i, InvoiceFilter::combine);
+            invoices = combinedFilters.apply(invoices);
+            return new ResponseEntity<>(new ArrayList<>(invoices), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -119,6 +125,7 @@ public class InvoiceImpl implements InvoiceApiDelegate {
                     .findAny();
             if (invoice_to_update.isPresent()){
                 invoice.setId(id);
+                invoice.setEdited(LocalDateTime.now());
                 invoiceRepository.save(invoice);
                 return new ResponseEntity<>(HttpStatus.OK);
             } else {
