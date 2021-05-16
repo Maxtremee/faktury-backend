@@ -141,9 +141,9 @@ paths:
       summary: get filtered invoices
       operationId: getInvoices
       parameters:
-      - name: name
+      - name: title
         in: query
-        description: Name of invoice to filter with
+        description: Title of invoice to filter with
         required: false
         style: form
         explode: true
