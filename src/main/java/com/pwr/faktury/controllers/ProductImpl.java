@@ -3,6 +3,7 @@ package com.pwr.faktury.controllers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.pwr.faktury.api.ProductApiDelegate;
@@ -84,7 +85,8 @@ public class ProductImpl implements ProductApiDelegate {
     public ResponseEntity<Void> newProduct(Product product) {
         User user = userService.getUser();
         if (user != null) {
-            if (!user.getProducts().isEmpty()) {
+            Set<Product> products = user.getProducts();
+            if (!products.isEmpty()) {
                 Optional<Product> product_to_check = user.getProducts().stream()
                         .filter(p -> p.getName().equals(product.getName())).findAny();
                 if (product_to_check.isPresent()) {
@@ -92,7 +94,7 @@ public class ProductImpl implements ProductApiDelegate {
                 }
             }
             productRepository.save(product);
-            user.getProducts().add(product);
+            products.add(product);
             userRepository.save(user);
             return new ResponseEntity<>(HttpStatus.CREATED);
         } else {
@@ -106,7 +108,7 @@ public class ProductImpl implements ProductApiDelegate {
         if (user != null) {
             Optional<Product> product_to_update = user.getProducts().stream().filter(p -> p.getId().equals(id))
                     .findAny();
-            if(product_to_update.isPresent()){
+            if (product_to_update.isPresent()){
                 product.setId(id);
                 productRepository.save(product);
                 return new ResponseEntity<>(HttpStatus.OK);
