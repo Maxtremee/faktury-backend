@@ -26,7 +26,7 @@ paths:
     post:
       tags:
       - auth
-      summary: logs user in
+      summary: login
       description: |
         If supplied with existing login and password generates session and grants user access to service
       operationId: login
@@ -83,11 +83,11 @@ paths:
       operationId: logout
       responses:
         "200":
-          description: successfully created account
+          description: successfully logged out
         "400":
           description: wrong request
-        "409":
-          description: user already exists
+        "401":
+          description: unauthorized
         "500":
           description: internal server error
   /change-password:
@@ -107,8 +107,10 @@ paths:
           description: successfully changed password
         "400":
           description: wrong request
+        "401":
+          description: unauthorized
         "403":
-          description: forbidden
+          description: old password doesn't match
         "500":
           description: internal server error
   /change-personal-info:
@@ -128,8 +130,8 @@ paths:
           description: successfully changed personal info
         "400":
           description: wrong request
-        "403":
-          description: forbidden
+        "401":
+          description: unauthorized
         "500":
           description: internal server error
   /invoice:
@@ -139,9 +141,9 @@ paths:
       summary: get filtered invoices
       operationId: getInvoices
       parameters:
-      - name: name
+      - name: title
         in: query
-        description: Name of invoice to filter with
+        description: Title of invoice to filter with
         required: false
         style: form
         explode: true
@@ -193,8 +195,8 @@ paths:
                   $ref: '#/components/schemas/Invoice'
         "400":
           description: wrong request
-        "403":
-          description: forbidden
+        "401":
+          description: unauthorized
         "500":
           description: internal server error
     post:
@@ -213,8 +215,8 @@ paths:
           description: invoice created
         "400":
           description: wrong request
-        "403":
-          description: forbidden
+        "401":
+          description: unauthorized
         "500":
           description: internal server error
   /invoice/pdf:
@@ -224,9 +226,9 @@ paths:
       summary: get filtered invoices summary in pdf
       operationId: getInvoicesPdf
       parameters:
-      - name: name
+      - name: title
         in: query
-        description: Name of invoice to filter with
+        description: Title of invoice to filter with
         required: false
         style: form
         explode: true
@@ -277,8 +279,8 @@ paths:
                 format: binary
         "400":
           description: wrong request
-        "403":
-          description: forbidden
+        "401":
+          description: unauthorized
         "500":
           description: internal server error
   /invoice/{id}:
@@ -307,6 +309,8 @@ paths:
           description: wrong request
         "404":
           description: no such invoice
+        "401":
+          description: unauthorized
         "500":
           description: internal server error
     put:
@@ -332,10 +336,10 @@ paths:
       responses:
         "200":
           description: success
-        "204":
-          description: no content
-        "403":
-          description: forbidden
+        "400":
+          description: wrong request
+        "401":
+          description: unauthorized
         "404":
           description: no such contractor
         "500":
@@ -365,6 +369,8 @@ paths:
                 format: binary
         "400":
           description: wrong request
+        "401":
+          description: unauthorized
         "404":
           description: no such invoice
         "500":
@@ -373,7 +379,8 @@ paths:
     get:
       tags:
       - contractor
-      summary: search for existing contractrors (autocomplete)
+      summary: |
+        search for existing contractrors - retrieves all if searchstr blank (length = 0 or just a space)
       operationId: getContractors
       parameters:
       - name: searchstr
@@ -395,6 +402,8 @@ paths:
                   $ref: '#/components/schemas/Contractor'
         "400":
           description: wrong request
+        "401":
+          description: unauthorized
         "500":
           description: internal server error
     post:
@@ -413,11 +422,42 @@ paths:
           description: contractor created
         "400":
           description: wrong request
+        "401":
+          description: unauthorized
         "409":
           description: contractor already exists
         "500":
           description: internal server error
   /contractor/{id}:
+    get:
+      tags:
+      - contractor
+      summary: get contractor data with ID
+      operationId: getContractorWithId
+      parameters:
+      - name: id
+        in: path
+        description: ID of the contractor to get
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contractor'
+        "400":
+          description: wrong request
+        "401":
+          description: unauthorized
+        "404":
+          description: contractor not found
+        "500":
+          description: internal server error
     put:
       tags:
       - contractor
@@ -441,10 +481,10 @@ paths:
       responses:
         "200":
           description: success
-        "204":
-          description: no content
-        "403":
-          description: forbidden
+        "400":
+          description: wrong request
+        "401":
+          description: unauthorized
         "404":
           description: no such contractor
         "500":
@@ -468,8 +508,8 @@ paths:
           description: success
         "400":
           description: wrong request
-        "403":
-          description: forbidden
+        "401":
+          description: unauthorized
         "404":
           description: no such contractor
         "500":
@@ -478,7 +518,8 @@ paths:
     get:
       tags:
       - product
-      summary: search for existing products (autocomplete)
+      summary: |
+        search for existing products - retrieves all if searchstr blank (length = 0 or just a space)
       operationId: getProducts
       parameters:
       - name: searchstr
@@ -488,7 +529,7 @@ paths:
         explode: true
         schema:
           type: string
-          example: jabłka
+          example: straws
       responses:
         "200":
           description: success
@@ -500,6 +541,8 @@ paths:
                   $ref: '#/components/schemas/Product'
         "400":
           description: wrong request
+        "401":
+          description: unauthorized
         "500":
           description: internal server error
     post:
@@ -518,11 +561,42 @@ paths:
           description: product created
         "400":
           description: wrong request
+        "401":
+          description: unauthorized
         "409":
           description: product already exists
         "500":
           description: internal server error
   /product/{id}:
+    get:
+      tags:
+      - product
+      summary: get product data with ID
+      operationId: getProductWithId
+      parameters:
+      - name: id
+        in: path
+        description: ID of the product to get
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Product'
+        "400":
+          description: wrong request
+        "401":
+          description: unauthorized
+        "404":
+          description: product not found
+        "500":
+          description: internal server error
     put:
       tags:
       - product
@@ -546,10 +620,10 @@ paths:
       responses:
         "200":
           description: success
-        "204":
-          description: no content
-        "403":
-          description: forbidden
+        "400":
+          description: wrong request
+        "401":
+          description: unauthorized
         "404":
           description: no such product
         "500":
@@ -573,8 +647,8 @@ paths:
           description: success
         "400":
           description: wrong request
-        "403":
-          description: forbidden
+        "401":
+          description: unauthorized
         "404":
           description: no such product
         "500":

@@ -45,8 +45,14 @@ public class LoginImpl implements LoginApiDelegate {
                 .collect(Collectors.toList());
 
         Optional<User> user = userRepository.findByLogin(userDetails.getLogin());
-        UserDetails uDetails = new UserDetails().id(userDetails.getId()).login(userDetails.getLogin()).accessToken(jwt).roles(roles).tokenType("Bearer").company(user.get().getPersonal_data());
-        return new ResponseEntity<>(uDetails, HttpStatus.OK);
+        if (user.isPresent()) {
+            UserDetails uDetails = new UserDetails().id(userDetails.getId()).login(userDetails.getLogin())
+                    .accessToken(jwt).roles(roles).tokenType("Bearer").company(user.get().getPersonal_data());
+            return new ResponseEntity<>(uDetails, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
     }
     
 }
