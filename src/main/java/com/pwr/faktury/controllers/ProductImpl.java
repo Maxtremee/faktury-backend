@@ -1,10 +1,12 @@
 package com.pwr.faktury.controllers;
 
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
 
 import com.pwr.faktury.api.ProductApiDelegate;
 import com.pwr.faktury.model.Product;
@@ -16,6 +18,7 @@ import com.pwr.faktury.security.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.stereotype.Service;
 
 @Service
