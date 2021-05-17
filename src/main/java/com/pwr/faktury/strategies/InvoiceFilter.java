@@ -1,7 +1,6 @@
 package com.pwr.faktury.strategies;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;

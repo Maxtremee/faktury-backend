@@ -1,5 +1,6 @@
 package com.pwr.faktury.controllers;
 
+import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -13,10 +14,13 @@ import com.pwr.faktury.model.Invoice;
 import com.pwr.faktury.models.User;
 import com.pwr.faktury.repositories.InvoiceRepository;
 import com.pwr.faktury.repositories.UserRepository;
+import com.pwr.faktury.security.services.InvoiceService;
 import com.pwr.faktury.security.services.UserService;
 import com.pwr.faktury.strategies.InvoiceFilter;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -31,6 +35,9 @@ public class InvoiceImpl implements InvoiceApiDelegate {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private InvoiceService invoiceService;
     
     @Override
     public ResponseEntity<Invoice> getInvoice(String id) {
@@ -50,8 +57,21 @@ public class InvoiceImpl implements InvoiceApiDelegate {
 
     @Override
     public ResponseEntity<org.springframework.core.io.Resource> getInvoicePdf(String id) {
-        //TODO: implement
-        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+        User user = userService.getUser();
+        if (user != null) {
+            Optional<Invoice> invoice_to_get = user.getInvoices().stream().filter(i -> i.getId().equals(id))
+                    .findAny();
+            if (invoice_to_get.isPresent()) {
+                ByteArrayInputStream bis = invoiceService.generatePdfFromId(user.getPersonal_data(), invoice_to_get.get());
+                HttpHeaders responseHeaders = new HttpHeaders();
+                responseHeaders.add("Content-Disposition", "inline; filename=" + invoice_to_get.get().getTitle().replaceAll("/", "-") + ".pdf");
+                return new ResponseEntity<>(new InputStreamResource(bis), responseHeaders, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+        } else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }    
     }
 
     @Override
@@ -76,7 +96,6 @@ public class InvoiceImpl implements InvoiceApiDelegate {
             if (contractor != null) {
                 filters.add(InvoiceFilter.contractor(contractor));
             }
-            System.out.println(filters);
             final InvoiceFilter combinedFilters = filters.stream().reduce(i -> i, InvoiceFilter::combine);
             invoices = combinedFilters.apply(invoices);
             return new ResponseEntity<>(new ArrayList<>(invoices), HttpStatus.OK);
