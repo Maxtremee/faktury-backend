@@ -1,10 +1,7 @@
 package com.pwr.faktury.security.services;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.pdf.PdfWriter;
 import com.pwr.faktury.model.Contractor;
 import com.pwr.faktury.model.Invoice;
 import com.pwr.faktury.model.InvoiceItem;
