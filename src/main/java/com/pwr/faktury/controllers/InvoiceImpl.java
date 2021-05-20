@@ -14,8 +14,8 @@ import com.pwr.faktury.model.Invoice;
 import com.pwr.faktury.models.User;
 import com.pwr.faktury.repositories.InvoiceRepository;
 import com.pwr.faktury.repositories.UserRepository;
-import com.pwr.faktury.security.services.InvoiceService;
 import com.pwr.faktury.security.services.UserService;
+import com.pwr.faktury.services.InvoiceService;
 import com.pwr.faktury.strategies.InvoiceFilter;
 
 import org.springframework.beans.factory.annotation.Autowired;

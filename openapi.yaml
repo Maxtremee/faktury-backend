@@ -767,11 +767,11 @@ components:
         sellDate:
           type: string
           example: 2016-08-29
-        dueDate:
+        paymentDate:
           type: string
           format: date
           example: 2016-08-30
-        info:
+        paymentType:
           type: string
           example: Płatność gotówką
     Product:
