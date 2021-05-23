@@ -138,7 +138,8 @@ paths:
     get:
       tags:
       - invoice
-      summary: get filtered invoices
+      summary: |
+        search for existing invoices - retrieves all if searchstr blank (length = 0 or just a space)
       operationId: getInvoices
       parameters:
       - name: title
@@ -342,6 +343,31 @@ paths:
           description: unauthorized
         "404":
           description: no such contractor
+        "500":
+          description: internal server error
+    delete:
+      tags:
+      - invoice
+      summary: delete specified invoice
+      operationId: deleteInvoice
+      parameters:
+      - name: id
+        in: path
+        description: ID of the invoice to delete
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: success
+        "400":
+          description: wrong request
+        "401":
+          description: unauthorized
+        "404":
+          description: no such invoice
         "500":
           description: internal server error
   /invoice/{id}/pdf:
