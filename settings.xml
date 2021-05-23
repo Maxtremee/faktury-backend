@@ -27,7 +27,7 @@
     <server>
       <id>github</id>
       <username>Maxtremee</username>
-      <password>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</password>
+      <password>${env.MAVEN_REPO_TOKEN}</password>
     </server>
   </servers>
 </settings>
