@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 public class InvoiceService {
     public ByteArrayInputStream generatePdfFromId(Contractor seller, Invoice invoice){
         PdfInvoice pdfInvoice = new PdfInvoice();
+        pdfInvoice.setTitle(invoice.getTitle());
         pdfInvoice.setBuyerData(invoice.getContractor().getName(), invoice.getContractor().getFirstAddressLine(), invoice.getContractor().getSecondAddressLine(), invoice.getContractor().getNip());
         pdfInvoice.setSellerData(seller.getName(), seller.getFirstAddressLine(), seller.getSecondAddressLine(), seller.getNip());
         pdfInvoice.setInfoData(invoice.getIssuePlace(), invoice.getIssueDate().toString(), invoice.getSellDate());
