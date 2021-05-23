@@ -38,6 +38,25 @@ public class InvoiceImpl implements InvoiceApiDelegate {
 
     @Autowired
     private InvoiceService invoiceService;
+
+    @Override
+    public ResponseEntity<Void> deleteInvoice(String id) {
+        User user = userService.getUser();
+        if (user != null) {
+            Optional<Invoice> invoice_to_check = user.getInvoices().stream().filter(i -> i.getId().equals(id))
+                    .findAny();
+            if (invoice_to_check.isPresent()) {
+                invoiceRepository.deleteById(id);
+                user.getInvoices().remove(invoice_to_check.get());
+                userRepository.save(user);
+                return new ResponseEntity<Void>(HttpStatus.OK);
+            } else {
+                return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
+            }
+        } else {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+    }
     
     @Override
     public ResponseEntity<Invoice> getInvoice(String id) {
