@@ -81,7 +81,11 @@ public class InvoiceImpl implements InvoiceApiDelegate {
             Optional<Invoice> invoice_to_get = user.getInvoices().stream().filter(i -> i.getId().equals(id))
                     .findAny();
             if (invoice_to_get.isPresent()) {
-                ByteArrayInputStream bis = invoiceService.generatePdfFromId(user.getPersonal_data(), invoice_to_get.get());
+                ByteArrayInputStream bis = invoiceService.generatePdfFromId(user.getPersonal_data(),
+                        invoice_to_get.get());
+                if (bis == null) {
+                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                }
                 HttpHeaders responseHeaders = new HttpHeaders();
                 responseHeaders.add("Content-Disposition", "inline; filename=" + invoice_to_get.get().getTitle().replaceAll("/", "-") + ".pdf");
                 return new ResponseEntity<>(new InputStreamResource(bis), responseHeaders, HttpStatus.OK);
