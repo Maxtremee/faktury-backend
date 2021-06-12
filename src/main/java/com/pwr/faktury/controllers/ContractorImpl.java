@@ -3,6 +3,7 @@ package com.pwr.faktury.controllers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.pwr.faktury.api.ContractorApiDelegate;
@@ -15,7 +16,9 @@ import com.pwr.faktury.security.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ContractorImpl implements ContractorApiDelegate {
     @Autowired
     private UserService userService;
@@ -72,12 +75,7 @@ public class ContractorImpl implements ContractorApiDelegate {
             // filter products with searchstr
             List<Contractor> foundContractors = user.getContractors().stream().filter(c -> c.getName().contains(searchstr))
                     .collect(Collectors.toList());
-            // if none found return 404
-            if (foundContractors.size() > 0) {
-                return new ResponseEntity<>(foundContractors, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
+            return new ResponseEntity<>(foundContractors, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -87,7 +85,8 @@ public class ContractorImpl implements ContractorApiDelegate {
     public ResponseEntity<Void> newContractor(Contractor contractor) {
         User user = userService.getUser();
         if (user != null) {
-            if (!user.getContractors().isEmpty()) {
+            Set<Contractor> contractors = user.getContractors();
+            if (!contractors.isEmpty()) {
                 Optional<Contractor> product_to_check = user.getContractors().stream()
                         .filter(c -> c.getName().equals(contractor.getName())).findAny();
                 if (product_to_check.isPresent()) {
@@ -95,7 +94,7 @@ public class ContractorImpl implements ContractorApiDelegate {
                 }
             }
             contractorRepository.save(contractor);
-            user.getContractors().add(contractor);
+            contractors.add(contractor);
             userRepository.save(user);
             return new ResponseEntity<>(HttpStatus.CREATED);
         } else {
