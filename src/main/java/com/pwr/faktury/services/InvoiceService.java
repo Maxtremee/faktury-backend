@@ -13,13 +13,19 @@ import org.springframework.stereotype.Service;
 public class InvoiceService {
     public ByteArrayInputStream generatePdfFromId(Contractor seller, Invoice invoice){
         PdfInvoice pdfInvoice = new PdfInvoice();
-        pdfInvoice.setTitle(invoice.getTitle());
-        pdfInvoice.setBuyerData(invoice.getContractor().getName(), invoice.getContractor().getFirstAddressLine(), invoice.getContractor().getSecondAddressLine(), invoice.getContractor().getNip());
-        pdfInvoice.setSellerData(seller.getName(), seller.getFirstAddressLine(), seller.getSecondAddressLine(), seller.getNip());
-        pdfInvoice.setInfoData(invoice.getIssuePlace(), invoice.getIssueDate().toString(), invoice.getSellDate());
-        pdfInvoice.setPaymentDetails(invoice.getPaymentType(), invoice.getPaymentDate().toString(), seller.getBankName(), seller.getBankAccountNumber());
-        for(InvoiceItem item : invoice.getProducts()){
-            pdfInvoice.addProduct(item.getName(), item.getQuantity().floatValue(), item.getUnit(), item.getPrice().floatValue(), item.getTax());
+        try {
+            pdfInvoice.setTitle(invoice.getTitle());
+            pdfInvoice.setBuyerData(invoice.getContractor().getName(), invoice.getContractor().getFirstAddressLine(), invoice.getContractor().getSecondAddressLine(), invoice.getContractor().getNip());
+            pdfInvoice.setSellerData(seller.getName(), seller.getFirstAddressLine(), seller.getSecondAddressLine(), seller.getNip());
+            pdfInvoice.setInfoData(invoice.getIssuePlace(), invoice.getIssueDate().toString(), invoice.getSellDate());
+            pdfInvoice.setPaymentDetails(invoice.getPaymentType(), invoice.getPaymentDate().toString(),
+                    seller.getBankName(), seller.getBankAccountNumber());
+            for (InvoiceItem item : invoice.getProducts()) {
+                pdfInvoice.addProduct(item.getName(), item.getQuantity().floatValue(), item.getUnit(),
+                        item.getPrice().floatValue(), item.getTax());
+            }
+        } catch (NullPointerException e) {
+            //catch block empty as null values are permitted
         }
         return pdfInvoice.createInvoice();
     }
