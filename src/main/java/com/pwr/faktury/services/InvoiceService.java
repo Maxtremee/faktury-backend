@@ -40,6 +40,11 @@ public class InvoiceService {
     }
 
     private String str(String str) {
-        return str != null ? str : "";
+        try {
+                return str != null ? str : "";
+        } catch (NullPointerException e) {
+                return "";
+        }
+        
     }
 }
