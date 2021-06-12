@@ -1,6 +1,7 @@
 package com.pwr.faktury.services;
 
 import java.io.ByteArrayInputStream;
+import java.util.Objects;
 
 import com.pwr.faktury.model.Contractor;
 import com.pwr.faktury.model.Invoice;
@@ -11,22 +12,34 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class InvoiceService {
-    public ByteArrayInputStream generatePdfFromId(Contractor seller, Invoice invoice){
+    public ByteArrayInputStream generatePdfFromId(Contractor seller, Invoice invoice) {
         PdfInvoice pdfInvoice = new PdfInvoice();
-        try {
-            pdfInvoice.setTitle(invoice.getTitle());
-            pdfInvoice.setBuyerData(invoice.getContractor().getName(), invoice.getContractor().getFirstAddressLine(), invoice.getContractor().getSecondAddressLine(), invoice.getContractor().getNip());
-            pdfInvoice.setSellerData(seller.getName(), seller.getFirstAddressLine(), seller.getSecondAddressLine(), seller.getNip());
-            pdfInvoice.setInfoData(invoice.getIssuePlace(), invoice.getIssueDate().toString(), invoice.getSellDate());
-            pdfInvoice.setPaymentDetails(invoice.getPaymentType(), invoice.getPaymentDate().toString(),
-                    seller.getBankName(), seller.getBankAccountNumber());
-            for (InvoiceItem item : invoice.getProducts()) {
-                pdfInvoice.addProduct(item.getName(), item.getQuantity().floatValue(), item.getUnit(),
-                        item.getPrice().floatValue(), item.getTax());
-            }
-        } catch (NullPointerException e) {
-            //catch block empty as null values are permitted
+        
+        pdfInvoice.setTitle(str(invoice.getTitle()));
+        pdfInvoice.setBuyerData(str(invoice.getContractor()
+                .getName()), str(
+                        invoice.getContractor()
+                                .getFirstAddressLine()),
+                str(invoice.getContractor().getSecondAddressLine()),str(invoice.getContractor().getNip()));
+        pdfInvoice.setSellerData(str(
+                seller.getName()), str(
+                        seller.getFirstAddressLine()), str(seller.getSecondAddressLine()),
+                str(seller.getNip()));
+        pdfInvoice.setInfoData(str(invoice.getIssuePlace()), str(
+                invoice.getIssueDate().toString()), str(invoice.getSellDate()));
+        pdfInvoice.setPaymentDetails(str(invoice
+                .getPaymentType()), str(
+                        invoice.getPaymentDate().toString()),
+                str(seller.getBankName()), str(seller.getBankAccountNumber()));
+        for (InvoiceItem item : invoice.getProducts()) {
+            pdfInvoice.addProduct(str(item.getName()), item.getQuantity().floatValue(), str(item.getUnit()),
+                    item.getPrice().floatValue(), item.getTax());
         }
+        
         return pdfInvoice.createInvoice();
+    }
+
+    private String str(String str) {
+        return str != null ? str : "";
     }
 }
