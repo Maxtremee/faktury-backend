@@ -83,11 +83,11 @@ paths:
       operationId: logout
       responses:
         "200":
-          description: successfully created account
+          description: successfully logged out
         "400":
           description: wrong request
-        "409":
-          description: user already exists
+        "401":
+          description: unauthorized
         "500":
           description: internal server error
   /change-password:
@@ -107,6 +107,10 @@ paths:
           description: successfully changed password
         "400":
           description: wrong request
+        "401":
+          description: unauthorized
+        "403":
+          description: old password doesn't match
         "500":
           description: internal server error
   /change-personal-info:
@@ -126,18 +130,21 @@ paths:
           description: successfully changed personal info
         "400":
           description: wrong request
+        "401":
+          description: unauthorized
         "500":
           description: internal server error
   /invoice:
     get:
       tags:
       - invoice
-      summary: get filtered invoices
+      summary: |
+        search for existing invoices - retrieves all if searchstr blank (length = 0 or just a space)
       operationId: getInvoices
       parameters:
-      - name: name
+      - name: title
         in: query
-        description: Name of invoice to filter with
+        description: Title of invoice to filter with
         required: false
         style: form
         explode: true
@@ -189,6 +196,8 @@ paths:
                   $ref: '#/components/schemas/Invoice'
         "400":
           description: wrong request
+        "401":
+          description: unauthorized
         "500":
           description: internal server error
     post:
@@ -207,6 +216,8 @@ paths:
           description: invoice created
         "400":
           description: wrong request
+        "401":
+          description: unauthorized
         "500":
           description: internal server error
   /invoice/pdf:
@@ -216,9 +227,9 @@ paths:
       summary: get filtered invoices summary in pdf
       operationId: getInvoicesPdf
       parameters:
-      - name: name
+      - name: title
         in: query
-        description: Name of invoice to filter with
+        description: Title of invoice to filter with
         required: false
         style: form
         explode: true
@@ -269,6 +280,8 @@ paths:
                 format: binary
         "400":
           description: wrong request
+        "401":
+          description: unauthorized
         "500":
           description: internal server error
   /invoice/{id}:
@@ -297,6 +310,8 @@ paths:
           description: wrong request
         "404":
           description: no such invoice
+        "401":
+          description: unauthorized
         "500":
           description: internal server error
     put:
@@ -322,10 +337,37 @@ paths:
       responses:
         "200":
           description: success
-        "204":
-          description: no content
+        "400":
+          description: wrong request
+        "401":
+          description: unauthorized
         "404":
           description: no such contractor
+        "500":
+          description: internal server error
+    delete:
+      tags:
+      - invoice
+      summary: delete specified invoice
+      operationId: deleteInvoice
+      parameters:
+      - name: id
+        in: path
+        description: ID of the invoice to delete
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: success
+        "400":
+          description: wrong request
+        "401":
+          description: unauthorized
+        "404":
+          description: no such invoice
         "500":
           description: internal server error
   /invoice/{id}/pdf:
@@ -353,6 +395,8 @@ paths:
                 format: binary
         "400":
           description: wrong request
+        "401":
+          description: unauthorized
         "404":
           description: no such invoice
         "500":
@@ -361,7 +405,8 @@ paths:
     get:
       tags:
       - contractor
-      summary: search for existing contractrors - retrieves all if searchstr not specified
+      summary: |
+        search for existing contractrors - retrieves all if searchstr blank (length = 0 or just a space)
       operationId: getContractors
       parameters:
       - name: searchstr
@@ -383,6 +428,8 @@ paths:
                   $ref: '#/components/schemas/Contractor'
         "400":
           description: wrong request
+        "401":
+          description: unauthorized
         "500":
           description: internal server error
     post:
@@ -401,6 +448,8 @@ paths:
           description: contractor created
         "400":
           description: wrong request
+        "401":
+          description: unauthorized
         "409":
           description: contractor already exists
         "500":
@@ -429,6 +478,8 @@ paths:
                 $ref: '#/components/schemas/Contractor'
         "400":
           description: wrong request
+        "401":
+          description: unauthorized
         "404":
           description: contractor not found
         "500":
@@ -456,8 +507,10 @@ paths:
       responses:
         "200":
           description: success
-        "204":
-          description: no content
+        "400":
+          description: wrong request
+        "401":
+          description: unauthorized
         "404":
           description: no such contractor
         "500":
@@ -481,6 +534,8 @@ paths:
           description: success
         "400":
           description: wrong request
+        "401":
+          description: unauthorized
         "404":
           description: no such contractor
         "500":
@@ -489,7 +544,8 @@ paths:
     get:
       tags:
       - product
-      summary: search for existing products - retrieves all if searchstr not specified
+      summary: |
+        search for existing products - retrieves all if searchstr blank (length = 0 or just a space)
       operationId: getProducts
       parameters:
       - name: searchstr
@@ -511,6 +567,8 @@ paths:
                   $ref: '#/components/schemas/Product'
         "400":
           description: wrong request
+        "401":
+          description: unauthorized
         "500":
           description: internal server error
     post:
@@ -529,6 +587,8 @@ paths:
           description: product created
         "400":
           description: wrong request
+        "401":
+          description: unauthorized
         "409":
           description: product already exists
         "500":
@@ -557,6 +617,8 @@ paths:
                 $ref: '#/components/schemas/Product'
         "400":
           description: wrong request
+        "401":
+          description: unauthorized
         "404":
           description: product not found
         "500":
@@ -584,8 +646,10 @@ paths:
       responses:
         "200":
           description: success
-        "204":
-          description: no content
+        "400":
+          description: wrong request
+        "401":
+          description: unauthorized
         "404":
           description: no such product
         "500":
@@ -609,6 +673,8 @@ paths:
           description: success
         "400":
           description: wrong request
+        "401":
+          description: unauthorized
         "404":
           description: no such product
         "500":
@@ -726,12 +792,13 @@ components:
           example: 2016-08-29
         sellDate:
           type: string
+          format: date
           example: 2016-08-29
-        dueDate:
+        paymentDate:
           type: string
           format: date
           example: 2016-08-30
-        info:
+        paymentType:
           type: string
           example: Płatność gotówką
     Product:
