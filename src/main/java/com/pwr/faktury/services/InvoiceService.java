@@ -38,6 +38,5 @@ public class InvoiceService {
                 } catch (NullPointerException e) {
                         return "";
                 }
-
         }
 }
