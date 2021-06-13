@@ -826,11 +826,22 @@ components:
         unit:
           type: string
           example: szt.
+    Address:
+      type: object
+      properties:
+        city:
+          type: string
+          example: Warszawa
+        street:
+          type: string
+          example: Al. Jerozolimskie 179
+        postalCode:
+          type: string
+          example: 02-222
     Contractor:
       required:
-      - firstAddressLine
+      - address
       - name
-      - nip
       type: object
       properties:
         id:
@@ -838,18 +849,18 @@ components:
         name:
           type: string
           example: Media Saturn Online Sp. z o.o.
+        address:
+          $ref: '#/components/schemas/Address'
         nip:
           type: string
           example: "1234567890"
-        firstAddressLine:
+        phoneNumber:
           type: string
-          example: "Al. Jerozolimskie 179, 02-222 Warszawa."
-        secondAddressLine:
+          example: 123 456 789
+        email:
           type: string
-          example: "Budynek B2, piętro 6"
-        info:
-          type: string
-          example: "tel. 123 456 789, email: email@email.com"
+          format: email
+          example: email@email.com
         bankName:
           type: string
           example: ALIOR BANK SA
