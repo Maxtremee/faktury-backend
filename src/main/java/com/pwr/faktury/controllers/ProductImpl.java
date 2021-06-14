@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.pwr.faktury.api.ProductApiDelegate;
+import com.pwr.faktury.model.InlineResponse201;
 import com.pwr.faktury.model.Product;
 import com.pwr.faktury.models.User;
 import com.pwr.faktury.repositories.ProductRepository;
@@ -83,7 +84,7 @@ public class ProductImpl implements ProductApiDelegate {
     }
 
     @Override
-    public ResponseEntity<Void> newProduct(Product product) {
+    public ResponseEntity<InlineResponse201> newProduct(Product product) {
         User user = userService.getUser();
         if (user != null) {
             Set<Product> products = user.getProducts();
@@ -94,10 +95,11 @@ public class ProductImpl implements ProductApiDelegate {
                     return new ResponseEntity<>(HttpStatus.CONFLICT);
                 }
             }
-            productRepository.save(product);
+            InlineResponse201 res = new InlineResponse201();
+            res.setId(productRepository.save(product).getId());
             products.add(product);
             userRepository.save(user);
-            return new ResponseEntity<>(HttpStatus.CREATED);
+            return new ResponseEntity<>(res, HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }

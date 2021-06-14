@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.pwr.faktury.api.InvoiceApiDelegate;
+import com.pwr.faktury.model.InlineResponse201;
 import com.pwr.faktury.model.Invoice;
 import com.pwr.faktury.models.User;
 import com.pwr.faktury.repositories.InvoiceRepository;
@@ -139,7 +140,7 @@ public class InvoiceImpl implements InvoiceApiDelegate {
     }
 
     @Override
-    public ResponseEntity<Void> newInvoice(Invoice invoice) {
+    public ResponseEntity<InlineResponse201> newInvoice(Invoice invoice) {
         User user = userService.getUser();
         if (user != null) {
             Set<Invoice> invoices = user.getInvoices();
@@ -150,10 +151,11 @@ public class InvoiceImpl implements InvoiceApiDelegate {
                     return new ResponseEntity<>(HttpStatus.CONFLICT);
                 }
             }
-            invoiceRepository.save(invoice);
+            InlineResponse201 res = new InlineResponse201();
+            res.setId(invoiceRepository.save(invoice).getId());
             invoices.add(invoice);
             userRepository.save(user);
-            return new ResponseEntity<>(HttpStatus.CREATED);
+            return new ResponseEntity<>(res, HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }

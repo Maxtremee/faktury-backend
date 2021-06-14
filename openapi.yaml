@@ -214,6 +214,10 @@ paths:
       responses:
         "201":
           description: invoice created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_201'
         "400":
           description: wrong request
         "401":
@@ -446,6 +450,10 @@ paths:
       responses:
         "201":
           description: contractor created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_201'
         "400":
           description: wrong request
         "401":
@@ -585,6 +593,10 @@ paths:
       responses:
         "201":
           description: product created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_201'
         "400":
           description: wrong request
         "401":
@@ -867,6 +879,11 @@ components:
         bankAccountNumber:
           type: string
           example: PL12 3456 0000 0000 0000 0000 7890
+    inline_response_201:
+      type: object
+      properties:
+        id:
+          type: string
   securitySchemes:
     bearerAuth:
       type: http

@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import com.pwr.faktury.api.ContractorApiDelegate;
 import com.pwr.faktury.model.Contractor;
+import com.pwr.faktury.model.InlineResponse201;
 import com.pwr.faktury.models.User;
 import com.pwr.faktury.repositories.ContractorRepository;
 import com.pwr.faktury.repositories.UserRepository;
@@ -82,7 +83,7 @@ public class ContractorImpl implements ContractorApiDelegate {
     }
 
     @Override
-    public ResponseEntity<Void> newContractor(Contractor contractor) {
+    public ResponseEntity<InlineResponse201> newContractor(Contractor contractor) {
         User user = userService.getUser();
         if (user != null) {
             Set<Contractor> contractors = user.getContractors();
@@ -93,10 +94,11 @@ public class ContractorImpl implements ContractorApiDelegate {
                     return new ResponseEntity<>(HttpStatus.CONFLICT);
                 }
             }
-            contractorRepository.save(contractor);
+            InlineResponse201 res = new InlineResponse201();
+            res.setId(contractorRepository.save(contractor).getId());
             contractors.add(contractor);
             userRepository.save(user);
-            return new ResponseEntity<>(HttpStatus.CREATED);
+            return new ResponseEntity<>(res, HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
