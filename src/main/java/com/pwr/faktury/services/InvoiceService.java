@@ -20,12 +20,12 @@ public class InvoiceService {
                 pdfInvoice.setTitle(str(invoice.getTitle()));
                 pdfInvoice.setBuyerData(
                                 str(invoice.getContractor().getName()),
-                                str(buyerAddress.getStreet()) + "," + str(buyerAddress.getPostalCode()) + " " + str(buyerAddress.getCity()),
+                                str(buyerAddress.getStreet()) + ", " + str(buyerAddress.getPostalCode()) + " " + str(buyerAddress.getCity()),
                                 "tel. " + str(invoice.getContractor().getPhoneNumber()) + ", email: " + str(invoice.getContractor().getEmail()),
                                 str(invoice.getContractor().getNip()));
                 pdfInvoice.setSellerData(
                                 str(seller.getName()),
-                                str(sellerAddress.getStreet()) + "," + str(sellerAddress.getPostalCode()) + " " + str(sellerAddress.getCity()),
+                                str(sellerAddress.getStreet()) + ", " + str(sellerAddress.getPostalCode()) + " " + str(sellerAddress.getCity()),
                                 "tel. " + str(seller.getPhoneNumber()) + " , email: " + str(seller.getEmail()),
                                 str(seller.getNip()));
                 pdfInvoice.setInfoData(
