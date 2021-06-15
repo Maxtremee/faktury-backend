@@ -1,6 +1,8 @@
 package com.pwr.faktury.controllers;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -20,9 +22,11 @@ import com.pwr.faktury.services.InvoiceService;
 import com.pwr.faktury.strategies.InvoiceFilter;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -84,13 +88,19 @@ public class InvoiceImpl implements InvoiceApiDelegate {
             if (invoice_to_get.isPresent()) {
                 ByteArrayInputStream bis = invoiceService.generatePdfFromId(user.getPersonal_data(),
                         invoice_to_get.get());
-                HttpHeaders responseHeaders = new HttpHeaders();
-                responseHeaders.add("Content-Disposition", "inline; filename=" + invoice_to_get.get().getTitle().replaceAll("/", "-") + ".pdf");
-                if (bis != null) {
-                    return new ResponseEntity<>(new InputStreamResource(bis), responseHeaders, HttpStatus.OK);
-                } else {
+                byte[] buffer = new byte[bis.available()];
+                try {
+                    bis.read(buffer);
+                } catch (IOException e) {
                     return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
+                HttpHeaders responseHeaders = new HttpHeaders();
+                responseHeaders.add("Content-Disposition",
+                        "inline; filename=" + invoice_to_get.get().getTitle().replaceAll("/", "-") + ".pdf");
+                responseHeaders.setContentType(MediaType.APPLICATION_PDF);
+                responseHeaders.add("Content-Length", Integer.toString(bis.available()));
+
+                return new ResponseEntity<>(new ByteArrayResource(buffer), responseHeaders, HttpStatus.OK);
             } else {
                 return new ResponseEntity<>(HttpStatus.NOT_FOUND);
             }
